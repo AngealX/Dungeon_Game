@@ -9,7 +9,7 @@ class Character():
     
     # first we will make our constructor (REMINDER: "def" starts functions):
     
-    def __init__(self, x, y, mob_animations, char_type): # "self" is always the first argument
+    def __init__(self, x, y, health, mob_animations, char_type): # "self" is always the first argument
         self.char_type = char_type
         self.flip = False # this will act as a trigger, so when the character goes right, the character image will flip to face that direction
         self.animation_list = mob_animations[char_type] # the "char_type" helps us determine which set is going to be aplicable by using the "char_type". So, if the image is the elf, then we must make sure that we are taking the first set of image
@@ -17,6 +17,10 @@ class Character():
         self.action = 0 # when its 0 = idle, when its 1 = run
         self.update_time = pygame.time.get_ticks() # use this to measure how much time has passed since the last time the frame has been updated
         self.running = False
+        self.health = health
+        self.alive = True # this is so when a monster (and even the player) health reaches zero, they will die/disappear in the game
+        
+        # taking care of the image
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = pygame.Rect(0, 0, 40, 40) # first 0 is the x-coordinate, the second 0 is the y-coordinate, and the last 40's is width and height (respectfully)
         self.rect.center = (x, y)
@@ -48,6 +52,11 @@ class Character():
 
 
     def update(self):
+        
+        # check to see if the character has died:
+        if self.health <= 0:
+            self.health = 0
+            self.alive = False
         
         # checks what action the player is performing
         if self.running == True:

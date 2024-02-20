@@ -82,11 +82,18 @@ for mob in mob_types:
         
     mob_animations.append(animation_list)
     
-# creating the chracter (REMINDER: We are using the "constructor" from the character file, in order maake our character):
-player = Character(100, 100, mob_animations, 0)
+# creating the chracter/player (REMINDER: We are using the "constructor" from the character file, in order maake our character):
+player = Character(100, 100, 100, mob_animations, 0)
+
+# creating the enemies/monsters (we are basically following the same process as creating the player. Which also implies that we will not to create alot of functions because it already exist in the character class):
+monster = Character(200, 300, 100, mob_animations, 1)
 
 # Creating the players weapon:
 bow = Weapon(bow_image, arrow_image)
+
+# creating an empty enemy list (for now, and we are doing this because we have more than one monster):
+monster_list = []
+monster_list.append(monster)
 
 # this will create the sprite group (for now, for the arrows):
 arrow_group = pygame.sprite.Group()
@@ -131,6 +138,8 @@ while run:
     player.move(dx, dy)
     
     # updates the player:
+    for monster in monster_list: # iterating through the monsters
+        monster.update()
     player.update() # from the update function in the character file
     
     # updating the character weapon (the bow):
@@ -140,13 +149,15 @@ while run:
         arrow_group.add(arrow) # with groups we use ".add()" instead of ".append()" (which is used for list)
 
     for arrow in arrow_group: # allows us to update through each of the arrows in the arrow group
-        arrow.update()
+        arrow.update(monster_list)
         
         
     # arrow_group.draw(screen), would be used since we are using sprite, meaning we would not need to make a draw class, but since we needed to modify
     # the arrows, we needed the draw method instead
         
     # here we will draw the character:
+    for monster in monster_list: # making the monster visible on our play screen
+        monster.draw(screen)
     player.draw(screen)
     
     # here we will draw/make the weapon:
