@@ -62,7 +62,7 @@ arrow_image = scale_img(pygame.image.load("assets/images/weapons/arrow.png").con
 
 # Loading all the characters we will be using by making pretty much a triple nested list:
 mob_animations = []
-mob_types = ["elf", "imp", "skeleton", "goblin", "muddy", "tiny_zombie", "big_demon"] # these names coarilate with the actual photos for the characters
+mob_types = ["elf", "imp", "skeleton", "goblin", "slime", "tiny_zombie", "big_demon"] # these names coarilate with the actual photos for the characters
 
 # starting at this point (until the end of the for loops) is where we are able to have
 # each character move while in idle and iterate through each of the characters
