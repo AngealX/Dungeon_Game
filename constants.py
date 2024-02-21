@@ -13,4 +13,5 @@ WEAPON_SCALE = 1.5 # making the bow larger
 
 # colors:
 RED = (255, 0, 0) # The "(255, 0, 0,)" is setup in the RGB format
+BLUE = (0, 0, 255)
 BG = (40, 25, 25) # This will change the background color of the map

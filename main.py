@@ -3,6 +3,7 @@
 # REMINDER: We have to always run on this file, sense it is the main file
 
 import pygame
+from pygame.sprite import Group
 from character import Character # we import the character file this way becase we are using "class" in the character file
 from weapon import Weapon # same applies for this file
 import constants # this is where all the variables that will not change will be stored here in the constant file
@@ -29,6 +30,10 @@ moving_right = False
 moving_up = False
 moving_down = False
 
+
+
+# font needed in order to print the damage onto the screen (pygame unfortunately do not allow us to do so other wise):
+font = pygame.font.Font("assets/fonts/AtariClassic.ttf", 20)
 
 # Here is the helper function to scale image(which helps to speed things up, especially for things that need to occur repeatedly):
 # This function also helps clean up the code some too
@@ -82,21 +87,58 @@ for mob in mob_types:
         
     mob_animations.append(animation_list)
     
-# creating the chracter/player (REMINDER: We are using the "constructor" from the character file, in order maake our character):
+
+
+#===================================== For the Damage Text Class ===============================================================================
+
+# Here we will create a new class, where this class will be the "damage text class" (this will also be a sprite class as well)
+# the whole goal is to take the random damage number that was dealt to the monster (or player) and print 
+# the said number onto the screen:
+class DamageText(pygame.sprite.Sprite):
+    def __init__(self, x, y, damage, color): # our constructor
+        pygame.sprite.Sprite.__init__(self) # the inherietance
+        self.image = font.render(damage, True, color)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
+      
+    def update(self): # this will help move damage text up and make the damage text disappear:
+        self.rect.y -= 1
+        
+        # deleting the counter after a few seconds:
+        self.counter += 1
+        if self.counter > 30:
+            self.kill()
+    
+
+
+#===================================== Allowing movement and iteration for the characters (cont) ===============================================================================
+
+# creating the chracter (REMINDER: We are using the "constructor" from the character file, in order maake our character):
 player = Character(100, 100, 100, mob_animations, 0)
 
-# creating the enemies/monsters (we are basically following the same process as creating the player. Which also implies that we will not to create alot of functions because it already exist in the character class):
-monster = Character(200, 300, 100, mob_animations, 1)
+# creating the enemies/monsters (here we are following the process for creating the player. We will not have to create alot of functions because we already have them in the character class):
+monster = Character(200, 300, 100, mob_animations, 1) # the 100 is for the monster health (same for the player)
 
 # Creating the players weapon:
 bow = Weapon(bow_image, arrow_image)
 
-# creating an empty enemy list (for now, and we are doing this because we have more than one monster):
+# Here we will create an empty list for the monsters that will appear (for now, we are doing this due to the many monsters we have):
 monster_list = []
 monster_list.append(monster)
 
+
+# here we are adding the sprite call (which is the group) to print the numbers from the damage:
+damage_text_group = pygame.sprite.Group()
+
 # this will create the sprite group (for now, for the arrows):
 arrow_group = pygame.sprite.Group()
+
+
+
+#  temp. damage text (helping with test printing):
+# damage_text = DamageText(300, 400, "15", constants.RED)
+# damage_text_group.add(damage_text)
 
 # ============================================================ MAIN CODE / LOOP ==========================================================================
 
@@ -138,7 +180,8 @@ while run:
     player.move(dx, dy)
     
     # updates the player:
-    for monster in monster_list: # iterating through the monsters
+    # here we will also produce the monster
+    for monster in monster_list:
         monster.update()
     player.update() # from the update function in the character file
     
@@ -149,14 +192,18 @@ while run:
         arrow_group.add(arrow) # with groups we use ".add()" instead of ".append()" (which is used for list)
 
     for arrow in arrow_group: # allows us to update through each of the arrows in the arrow group
-        arrow.update(monster_list)
-        
+        damage, damage_pos = arrow.update(monster_list)
+        if damage:
+            damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), constants.RED)
+            damage_text_group.add(damage_text)
+            
+    damage_text_group.update()
         
     # arrow_group.draw(screen), would be used since we are using sprite, meaning we would not need to make a draw class, but since we needed to modify
     # the arrows, we needed the draw method instead
         
-    # here we will draw the character:
-    for monster in monster_list: # making the monster visible on our play screen
+    # here we will draw the character(and monsters):
+    for monster in monster_list:
         monster.draw(screen)
     player.draw(screen)
     
@@ -166,6 +213,7 @@ while run:
     # iterating througj the arrow group:
     for arrow in arrow_group:
         arrow.draw(screen)
+    damage_text_group.draw(screen)
         
         
     # first, we want to be able to exit out of the screen by creating an event handler

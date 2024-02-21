@@ -75,6 +75,10 @@ class Arrow(pygame.sprite.Sprite):
         
     def update(self, monster_list): # this is for the arrow animation (for now)
         
+        # resetting variables:
+        damage = 0
+        damage_pos = None
+        
         # reposition based on the speed of the arrow:
         self.rect.x += self.dx
         self.rect.y += self.dy
@@ -84,7 +88,7 @@ class Arrow(pygame.sprite.Sprite):
         if self.rect.right < 0 or self.rect.left > constants.SCREEN_WIDTH or self.rect.bottom < 0 or self.rect.top > constants.SCREEN_HEIGHT:
             self.kill() # this is apart of the sprite class, we can just kill the sprite if any of the commands are true
             
-        
+            
         # Here we will check to see if the arrow of our players bow has made contact with the monster
         # Also, we will check to see if the enemy is still alive, if it is then the arrow will continue hitting
         # the enemy and not go through them. However (for now), if the enemy is dead then the arrow will go past them:
@@ -92,10 +96,17 @@ class Arrow(pygame.sprite.Sprite):
             if monster.rect.colliderect(self.rect) and monster.alive:
                 damage = 10 + random.randint(-5, 5) # the 10 is the base damage of the arrow, the "-5, 5" means we can make damage from 5 to 15
                 monster.health -= damage # whatever random damage is taken by the enemy, they will have it subtracted from their health
+                
+                # so we can show/print the damage onto the screen, but for where the monster is:
+                damage_pos = monster.rect
+                
                 # next, we will want to stop the arrow once it makes contact with the monster
                 self.kill()
                 break
-                
+            
+        # returning the daamage so it can show on the screen:
+        return damage, damage_pos
+        
     # here we will make the draw fucntion for the arrow:
     def draw(self, surface): # sprites normally do not need a draw method because it already has its own, but we need to make it to
         surface.blit(self.image, ((self.rect.centerx - int(self.image.get_width()/2)), self.rect.centery - int(self.image.get_height()/2)))
